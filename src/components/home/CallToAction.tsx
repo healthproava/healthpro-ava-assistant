@@ -1,9 +1,24 @@
-
 import React from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from "@/hooks/use-toast";
 
 const CallToAction = () => {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleDemoRequest = () => {
+    // Show confirmation toast
+    toast({
+      title: "Demo Request Received",
+      description: "Our team will contact you shortly to schedule a demo.",
+    });
+    
+    // Navigate to contact form
+    navigate('/#contact');
+  };
+
   return (
     <section id="cta" className="py-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-hpa-blue/10 to-blue-100/20 z-[-1]" />
@@ -36,10 +51,16 @@ const CallToAction = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <Button className="bg-hpa-blue hover:bg-blue-600 text-white px-8 py-6 text-lg font-medium">
-                Start Your Free Trial <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="outline" className="border-hpa-blue text-hpa-blue hover:bg-blue-50 px-8 py-6 text-lg font-medium">
+              <Link to="/assessment">
+                <Button className="bg-hpa-blue hover:bg-blue-600 text-white px-8 py-6 text-lg font-medium w-full sm:w-auto">
+                  Start Your Free Trial <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Button 
+                variant="outline" 
+                className="border-hpa-blue text-hpa-blue hover:bg-blue-50 px-8 py-6 text-lg font-medium w-full sm:w-auto"
+                onClick={handleDemoRequest}
+              >
                 Schedule a Demo
               </Button>
             </div>

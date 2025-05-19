@@ -1,324 +1,495 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import PortalLayout from '@/components/portal/PortalLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, LineChart, PieChart } from "@/components/ui/chart";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, Users, Building, DollarSign, ChevronRight, Calendar, MessageSquare, Bell } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Link } from 'react-router-dom';
+import { 
+  User, Calendar, Building, MapPin, BarChart3, PlusCircle, Search, 
+  ArrowRight, Phone, Mail, ChevronRight, Clock, FileText, CalendarClock, 
+  AlertCircle, Filter, Home, BellRing, CheckCircle, PieChart, Activity,
+  MoreHorizontal, Download, Printer, Share2, RefreshCw, Star, Users, 
+  Clipboard
+} from 'lucide-react';
+
+// Generate random percentage for demo
+const randomProgress = () => Math.floor(Math.random() * 100);
+
+// Helper function for current date
+const getCurrentDate = () => {
+  const date = new Date();
+  return date.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+};
 
 const Dashboard = () => {
-  // Dummy data for visualization
-  const placementData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Placements',
-        data: [4, 6, 8, 5, 10, 12],
-        backgroundColor: '#2563eb',
-      },
-    ],
+  const [period, setPeriod] = useState('week');
+  const [addClientDialog, setAddClientDialog] = useState(false);
+  const currentDate = getCurrentDate();
+  
+  // Mock data for dashboard
+  const stats = {
+    activeClients: 24,
+    pendingAssessments: 6,
+    scheduledTours: 8,
+    completedPlacements: 15
   };
-
-  const revenueData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Revenue',
-        data: [12000, 19000, 15000, 18000, 22000, 25000],
-        borderColor: '#16a34a',
-        backgroundColor: 'rgba(22, 163, 74, 0.1)',
-        tension: 0.4,
-      },
-    ],
+  
+  const taskCompletion = {
+    assessments: randomProgress(),
+    tours: randomProgress(),
+    placements: randomProgress()
   };
-
-  const facilityTypeData = {
-    labels: ['Assisted Living', 'Memory Care', 'Nursing Home', 'Independent Living'],
-    datasets: [
-      {
-        label: 'Facilities by Type',
-        data: [42, 28, 15, 35],
-        backgroundColor: ['#2563eb', '#16a34a', '#9333ea', '#f59e0b'],
-        borderWidth: 0,
-      },
-    ],
-  };
-
-  const upcomingClients = [
-    { id: 1, name: 'Mary Johnson', location: 'Phoenix, AZ', date: 'Today, 2:30 PM', type: 'Initial Consultation', avatar: null },
-    { id: 2, name: 'Robert Smith', location: 'Scottsdale, AZ', date: 'Tomorrow, 11:00 AM', type: 'Facility Tour', avatar: null },
-    { id: 3, name: 'Susan Brown', location: 'Mesa, AZ', date: 'Jul 20, 3:15 PM', type: 'Paperwork Review', avatar: null },
+  
+  const recentClients = [
+    {
+      id: '1',
+      name: 'Mary Johnson',
+      avatar: "/lovable-uploads/b6e2fabe-745f-4129-a03e-51af7117e3c6.png",
+      careType: 'Memory Care',
+      status: 'Active',
+      dateAdded: '2023-07-15',
+      location: 'Phoenix, AZ'
+    },
+    {
+      id: '2',
+      name: 'James Wilson',
+      avatar: "",
+      careType: 'Assisted Living',
+      status: 'Assessment',
+      dateAdded: '2023-07-20',
+      location: 'Scottsdale, AZ'
+    },
+    {
+      id: '3',
+      name: 'Elizabeth Brown',
+      avatar: "",
+      careType: 'Independent Living',
+      status: 'Tour Scheduled',
+      dateAdded: '2023-07-24',
+      location: 'Mesa, AZ'
+    },
+    {
+      id: '4',
+      name: 'Robert Davis',
+      avatar: "",
+      careType: 'Memory Care',
+      status: 'Application',
+      dateAdded: '2023-08-02',
+      location: 'Chandler, AZ'
+    },
+    {
+      id: '5',
+      name: 'Susan Miller',
+      avatar: "",
+      careType: 'Skilled Nursing',
+      status: 'Placed',
+      dateAdded: '2023-06-12',
+      location: 'Gilbert, AZ'
+    }
   ];
-
-  const activeFacilities = [
-    { id: 1, name: 'Desert Bloom Senior Living', location: 'Phoenix, AZ', type: 'Assisted Living', availableBeds: 3 },
-    { id: 2, name: 'Sunrise of Scottsdale', location: 'Scottsdale, AZ', type: 'Memory Care', availableBeds: 2 },
-    { id: 3, name: 'Mesa Gardens', location: 'Mesa, AZ', type: 'Independent Living', availableBeds: 5 },
-    { id: 4, name: 'Arizona Sunset Care', location: 'Tempe, AZ', type: 'Nursing Home', availableBeds: 1 },
+  
+  const upcomingAppointments = [
+    {
+      id: '1',
+      title: 'Tour with Mary Johnson',
+      facility: 'Desert Bloom Senior Living',
+      date: 'Aug 10, 2023',
+      time: '2:30 PM',
+      type: 'facility-tour'
+    },
+    {
+      id: '2',
+      title: 'Assessment for James Wilson',
+      facility: 'Office',
+      date: 'Aug 11, 2023',
+      time: '10:00 AM',
+      type: 'assessment'
+    },
+    {
+      id: '3',
+      title: 'Follow-up Call with David Smith',
+      facility: 'Phone',
+      date: 'Aug 12, 2023',
+      time: '11:00 AM',
+      type: 'call'
+    }
   ];
-
+  
+  const topFacilities = [
+    {
+      id: '1',
+      name: 'Desert Bloom Senior Living',
+      type: 'Memory Care & Assisted Living',
+      placements: 7,
+      rating: 4.8
+    },
+    {
+      id: '2',
+      name: 'Sunrise of Scottsdale',
+      type: 'Assisted Living',
+      placements: 5,
+      rating: 4.5
+    },
+    {
+      id: '3',
+      name: 'Arizona Sunset Care',
+      type: 'Memory Care',
+      placements: 3,
+      rating: 4.3
+    }
+  ];
+  
+  const notifications = [
+    {
+      id: '1',
+      title: 'New Assessment Completed',
+      description: 'Assessment for James Wilson is ready for review',
+      time: '2 hours ago',
+      read: false
+    },
+    {
+      id: '2',
+      title: 'Tour Confirmation',
+      description: 'Mary Johnson confirmed tour at Desert Bloom',
+      time: '4 hours ago',
+      read: false
+    },
+    {
+      id: '3',
+      title: 'Placement Successful',
+      description: 'Susan Miller has been placed at Sunrise of Scottsdale',
+      time: '1 day ago',
+      read: true
+    },
+    {
+      id: '4',
+      title: 'Document Upload',
+      description: 'Elizabeth Brown uploaded medical records',
+      time: '2 days ago',
+      read: true
+    }
+  ];
+  
   return (
     <PortalLayout>
-      <div className="grid gap-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <div className="flex items-center gap-3">
-            <Button size="sm" variant="outline">
-              <Calendar className="h-4 w-4 mr-2" />
-              July 2023
-            </Button>
-            <Button size="icon" variant="outline">
-              <Bell className="h-4 w-4" />
+      <div className="space-y-6">
+        {/* Dashboard Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <p className="text-muted-foreground">{currentDate}</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Select defaultValue="week" onValueChange={setPeriod}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Select period" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="day">Today</SelectItem>
+                <SelectItem value="week">This Week</SelectItem>
+                <SelectItem value="month">This Month</SelectItem>
+                <SelectItem value="quarter">This Quarter</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button onClick={() => setAddClientDialog(true)}>
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Add Client
             </Button>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-start justify-between">
+              <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Placements</p>
-                  <h3 className="text-2xl font-bold mt-1">45</h3>
-                  <p className="text-xs text-green-500 mt-1">↑ 12% from last month</p>
+                  <p className="text-sm font-medium text-muted-foreground">Active Clients</p>
+                  <p className="text-3xl font-bold">{stats.activeClients}</p>
                 </div>
                 <div className="bg-blue-100 p-2 rounded-full">
-                  <Users className="h-5 w-5 text-blue-600" />
+                  <User className="h-5 w-5 text-blue-600" />
                 </div>
+              </div>
+              <div className="mt-4 flex items-center text-sm">
+                <span className="text-green-500 font-medium">+4</span>
+                <span className="text-muted-foreground ml-1">from last {period}</span>
               </div>
             </CardContent>
           </Card>
           
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-start justify-between">
+              <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm text-muted-foreground">Active Clients</p>
-                  <h3 className="text-2xl font-bold mt-1">28</h3>
-                  <p className="text-xs text-green-500 mt-1">↑ 8% from last month</p>
-                </div>
-                <div className="bg-green-100 p-2 rounded-full">
-                  <Users className="h-5 w-5 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Partner Facilities</p>
-                  <h3 className="text-2xl font-bold mt-1">120</h3>
-                  <p className="text-xs text-green-500 mt-1">↑ 5 new this month</p>
-                </div>
-                <div className="bg-purple-100 p-2 rounded-full">
-                  <Building className="h-5 w-5 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Revenue (YTD)</p>
-                  <h3 className="text-2xl font-bold mt-1">$112K</h3>
-                  <p className="text-xs text-green-500 mt-1">↑ 15% from last year</p>
+                  <p className="text-sm font-medium text-muted-foreground">Pending Assessments</p>
+                  <p className="text-3xl font-bold">{stats.pendingAssessments}</p>
                 </div>
                 <div className="bg-amber-100 p-2 rounded-full">
-                  <DollarSign className="h-5 w-5 text-amber-600" />
+                  <Clipboard className="h-5 w-5 text-amber-600" />
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="col-span-2">
-            <CardHeader>
-              <CardTitle>Performance Overview</CardTitle>
-              <CardDescription>View your placement and revenue performance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="placements">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="placements">Placements</TabsTrigger>
-                  <TabsTrigger value="revenue">Revenue</TabsTrigger>
-                </TabsList>
-                <TabsContent value="placements">
-                  <div className="h-80">
-                    <BarChart data={placementData} />
-                  </div>
-                </TabsContent>
-                <TabsContent value="revenue">
-                  <div className="h-80">
-                    <LineChart data={revenueData} />
-                  </div>
-                </TabsContent>
-              </Tabs>
+              <div className="mt-4 flex items-center text-sm">
+                <span className="text-amber-500 font-medium">+2</span>
+                <span className="text-muted-foreground ml-1">need attention</span>
+              </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader>
-              <CardTitle>Facility Distribution</CardTitle>
-              <CardDescription>Breakdown by facility type</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-72">
-                <PieChart data={facilityTypeData} />
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Scheduled Tours</p>
+                  <p className="text-3xl font-bold">{stats.scheduledTours}</p>
+                </div>
+                <div className="bg-green-100 p-2 rounded-full">
+                  <Calendar className="h-5 w-5 text-green-600" />
+                </div>
               </div>
-              <div className="mt-4 grid gap-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="h-3 w-3 rounded-full bg-blue-600 mr-2"></div>
-                    <span className="text-sm">Assisted Living</span>
-                  </div>
-                  <span className="font-medium">42</span>
+              <div className="mt-4 flex items-center text-sm">
+                <span className="text-green-500 font-medium">+3</span>
+                <span className="text-muted-foreground ml-1">this {period}</span>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Completed Placements</p>
+                  <p className="text-3xl font-bold">{stats.completedPlacements}</p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="h-3 w-3 rounded-full bg-green-600 mr-2"></div>
-                    <span className="text-sm">Memory Care</span>
-                  </div>
-                  <span className="font-medium">28</span>
+                <div className="bg-purple-100 p-2 rounded-full">
+                  <Home className="h-5 w-5 text-purple-600" />
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="h-3 w-3 rounded-full bg-purple-600 mr-2"></div>
-                    <span className="text-sm">Nursing Home</span>
-                  </div>
-                  <span className="font-medium">15</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="h-3 w-3 rounded-full bg-amber-500 mr-2"></div>
-                    <span className="text-sm">Independent Living</span>
-                  </div>
-                  <span className="font-medium">35</span>
-                </div>
+              </div>
+              <div className="mt-4 flex items-center text-sm">
+                <span className="text-green-500 font-medium">+2</span>
+                <span className="text-muted-foreground ml-1">from last {period}</span>
               </div>
             </CardContent>
           </Card>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Task Completion */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader>
+              <CardTitle>Task Completion</CardTitle>
+              <CardDescription>Progress for this {period}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Assessments</span>
+                  <span className="font-medium">{taskCompletion.assessments}%</span>
+                </div>
+                <Progress value={taskCompletion.assessments} className="h-2" />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Tours Conducted</span>
+                  <span className="font-medium">{taskCompletion.tours}%</span>
+                </div>
+                <Progress value={taskCompletion.tours} className="h-2" />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Placement Success</span>
+                  <span className="font-medium">{taskCompletion.placements}%</span>
+                </div>
+                <Progress value={taskCompletion.placements} className="h-2" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Recent Clients */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle>Recent Clients</CardTitle>
+                <CardDescription>Last 30 days</CardDescription>
+              </div>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/clients">
+                  View All
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[280px]">
+                <div className="space-y-4">
+                  {recentClients.map((client) => (
+                    <div key={client.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          <AvatarImage src={client.avatar} alt={client.name} />
+                          <AvatarFallback>{client.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{client.name}</p>
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <MapPin className="mr-1 h-3 w-3" />
+                            {client.location}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant={
+                          client.status === 'Active' ? 'default' :
+                          client.status === 'Assessment' ? 'secondary' :
+                          client.status === 'Tour Scheduled' ? 'outline' :
+                          client.status === 'Placed' ? 'secondary' :
+                          'outline'
+                        }>
+                          {client.status}
+                        </Badge>
+                        <p className="text-xs text-muted-foreground mt-1">{client.careType}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Upcoming Appointments */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div>
                 <CardTitle>Upcoming Appointments</CardTitle>
-                <CardDescription>Your schedule for the next few days</CardDescription>
+                <CardDescription>Next 7 days</CardDescription>
               </div>
-              <Button variant="ghost" size="sm" className="gap-1">
-                View All <ChevronRight className="h-4 w-4" />
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/calendar">
+                  View Calendar
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Link>
               </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {upcomingClients.map((client) => (
-                  <div key={client.id} className="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={client.avatar || ''} alt={client.name} />
-                      <AvatarFallback>{client.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium">{client.name}</p>
-                        <p className="text-xs text-muted-foreground">{client.location}</p>
-                      </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground">{client.date}</p>
-                      </div>
-                      <p className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full inline-block mt-2">{client.type}</p>
+                {upcomingAppointments.map((appointment) => (
+                  <div key={appointment.id} className="flex items-start gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
+                    <div className={`p-2 rounded-full ${
+                      appointment.type === 'facility-tour' ? 'bg-blue-100' :
+                      appointment.type === 'assessment' ? 'bg-amber-100' :
+                      'bg-green-100'
+                    }`}>
+                      {appointment.type === 'facility-tour' ? (
+                        <Building className={`h-4 w-4 ${
+                          appointment.type === 'facility-tour' ? 'text-blue-600' :
+                          appointment.type === 'assessment' ? 'text-amber-600' :
+                          'text-green-600'
+                        }`} />
+                      ) : appointment.type === 'assessment' ? (
+                        <Clipboard className="h-4 w-4 text-amber-600" />
+                      ) : (
+                        <Phone className="h-4 w-4 text-green-600" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{appointment.title}</p>
+                      <p className="text-sm text-muted-foreground">{appointment.facility}</p>
+                    </div>
+                    <div className="text-right text-sm">
+                      <p className="font-medium">{appointment.date}</p>
+                      <p className="text-muted-foreground">{appointment.time}</p>
                     </div>
                   </div>
                 ))}
+                
+                <Button variant="outline" className="w-full">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add Appointment
+                </Button>
               </div>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Arizona Facilities with Availability</CardTitle>
-                <CardDescription>Facilities with open beds in your region</CardDescription>
-              </div>
-              <Button variant="ghost" size="sm" className="gap-1">
-                View All <ChevronRight className="h-4 w-4" />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {activeFacilities.map((facility) => (
-                  <div key={facility.id} className="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50">
-                    <div className="bg-slate-100 h-10 w-10 rounded-md flex items-center justify-center">
-                      <Building className="h-5 w-5 text-slate-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
+          {/* Top Facilities & Notifications */}
+          <div className="space-y-6">
+            {/* Top Facilities */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Facilities</CardTitle>
+                <CardDescription>By placement rate</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {topFacilities.map((facility) => (
+                    <div key={facility.id} className="flex items-center justify-between">
+                      <div>
                         <p className="font-medium">{facility.name}</p>
-                        <p className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">{facility.availableBeds} beds</p>
+                        <p className="text-sm text-muted-foreground">{facility.type}</p>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">{facility.location}</p>
-                      <p className="text-xs bg-slate-100 text-slate-800 px-2 py-0.5 rounded-full inline-block mt-2">{facility.type}</p>
+                      <div className="text-right">
+                        <div className="flex items-center gap-1">
+                          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                          <span className="font-medium">{facility.rating}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{facility.placements} placements</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Notifications */}
+            <Card>
+              <CardHeader className="flex flex-row items-center pb-2">
+                <CardTitle className="flex-1">Notifications</CardTitle>
+                <Button variant="ghost" size="sm" className="h-8 text-xs">
+                  Mark All Read
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {notifications.slice(0, 3).map((notification) => (
+                    <div key={notification.id} className={`flex gap-3 ${!notification.read ? 'bg-muted/50' : ''} p-2 rounded-md`}>
+                      <div className={`p-2 rounded-full shrink-0 ${!notification.read ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                        <BellRing className={`h-4 w-4 ${!notification.read ? 'text-blue-600' : 'text-gray-500'}`} />
+                      </div>
+                      <div className="space-y-1">
+                        <p className={`text-sm font-medium ${!notification.read ? '' : 'text-muted-foreground'}`}>
+                          {notification.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{notification.description}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {notification.time}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Ava Interactions</CardTitle>
-            <CardDescription>Latest conversations and actions by Ava</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src="/lovable-uploads/a76d8094-6656-45e2-bb65-c21bedb59617.png" alt="Ava" />
-                  <AvatarFallback>A</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium">Email drafted for Robert Smith</p>
-                  <p className="text-sm text-muted-foreground">Follow-up after Sunrise of Scottsdale tour</p>
-                  <p className="text-xs text-muted-foreground mt-1">Today, 11:23 AM</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src="/lovable-uploads/a76d8094-6656-45e2-bb65-c21bedb59617.png" alt="Ava" />
-                  <AvatarFallback>A</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium">Client application completed</p>
-                  <p className="text-sm text-muted-foreground">Mary Johnson's application to Desert Bloom Senior Living</p>
-                  <p className="text-xs text-muted-foreground mt-1">Yesterday, 4:15 PM</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src="/lovable-uploads/a76d8094-6656-45e2-bb65-c21bedb59617.png" alt="Ava" />
-                  <AvatarFallback>A</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium">Appointment scheduled</p>
-                  <p className="text-sm text-muted-foreground">Virtual tour of Mesa Gardens with Susan Brown</p>
-                  <p className="text-xs text-muted-foreground mt-1">Jul 18, 10:30 AM</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </PortalLayout>
   );
