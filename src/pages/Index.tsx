@@ -40,7 +40,7 @@ const Index = () => {
           duration: 3000,
         });
       }
-    }, 5000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [toast, isMobile]);
