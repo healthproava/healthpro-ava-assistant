@@ -16,7 +16,7 @@ import {
   Filter, Plus, Check, Heart, Map, ChevronRight, Info, Bed, Ban, 
   Clock, DollarSign, Leaf, Utensils, Dumbbell, Wifi, Car, ExternalLink
 } from 'lucide-react';
-import { StorepointMap } from '@/components/map/StorepointMap';
+import MapView from '@/components/MapView';
 import { toast } from 'sonner';
 
 const Facilities = () => {
@@ -309,6 +309,7 @@ const Facilities = () => {
             <TabsList>
               <TabsTrigger value="grid">Grid View</TabsTrigger>
               <TabsTrigger value="table">Table View</TabsTrigger>
+              <TabsTrigger value="map">Map View</TabsTrigger>
             </TabsList>
             
             <Button
@@ -451,6 +452,21 @@ const Facilities = () => {
                     ))}
                   </TableBody>
                 </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="map" className="mt-6">
+            <Card>
+              <CardContent className="p-0">
+                <div className="h-[600px]">
+                  <MapView 
+                    facilities={filteredFacilities} 
+                    isLoading={false} 
+                    hasSearched={hasSearched}
+                    isVisible={currentView === 'map'}
+                  />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
