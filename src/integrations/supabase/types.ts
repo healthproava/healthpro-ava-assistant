@@ -39,40 +39,70 @@ export type Database = {
         Row: {
           address: string | null
           city: string | null
+          created_at: string | null
+          data_source: string | null
           description: string | null
+          facility_type: string | null
           geo: Json | null
           id: string
           is_promoted: boolean | null
+          latitude: number | null
+          longitude: number | null
           name: string
           phone: string | null
+          place_id: string | null
+          rating: number | null
+          reviews_count: number | null
           state: string | null
           tags: string[] | null
+          updated_at: string | null
+          website: string | null
           zip: string | null
         }
         Insert: {
           address?: string | null
           city?: string | null
+          created_at?: string | null
+          data_source?: string | null
           description?: string | null
+          facility_type?: string | null
           geo?: Json | null
           id?: string
           is_promoted?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           name: string
           phone?: string | null
+          place_id?: string | null
+          rating?: number | null
+          reviews_count?: number | null
           state?: string | null
           tags?: string[] | null
+          updated_at?: string | null
+          website?: string | null
           zip?: string | null
         }
         Update: {
           address?: string | null
           city?: string | null
+          created_at?: string | null
+          data_source?: string | null
           description?: string | null
+          facility_type?: string | null
           geo?: Json | null
           id?: string
           is_promoted?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           name?: string
           phone?: string | null
+          place_id?: string | null
+          rating?: number | null
+          reviews_count?: number | null
           state?: string | null
           tags?: string[] | null
+          updated_at?: string | null
+          website?: string | null
           zip?: string | null
         }
         Relationships: []
@@ -191,6 +221,71 @@ export type Database = {
           query?: string | null
           session_id?: string | null
           timestamp?: string | null
+        }
+        Relationships: []
+      }
+      serpapi_raw_results: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          parsing_status: string
+          raw_json_data: Json
+          user_search_request_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          parsing_status?: string
+          raw_json_data: Json
+          user_search_request_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          parsing_status?: string
+          raw_json_data?: Json
+          user_search_request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "serpapi_raw_results_user_search_request_id_fkey"
+            columns: ["user_search_request_id"]
+            isOneToOne: false
+            referencedRelation: "user_search_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_search_requests: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          search_criteria: Json
+          serpapi_query_sent: string | null
+          status: string
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          search_criteria: Json
+          serpapi_query_sent?: string | null
+          status?: string
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          search_criteria?: Json
+          serpapi_query_sent?: string | null
+          status?: string
         }
         Relationships: []
       }
