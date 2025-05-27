@@ -1,8 +1,9 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export interface Facility {
-  id?: string;
+  id: string;
   name: string;
   address: string;
   city: string;
@@ -44,12 +45,12 @@ export async function getFacilities(): Promise<Facility[]> {
     const facilities: Facility[] = data.map(item => ({
       id: item.id,
       name: item.name,
-      address: item.address,
+      address: item.address || "",
       city: item.city || "",
       state: item.state || "",
-      zip_code: item.zip_code || "",
-      phone: item.phone_number || "",
-      type: Array.isArray(item.care_types) && item.care_types.length > 0 ? item.care_types[0] : "",
+      zip_code: item.zip || "",
+      phone: item.phone || "",
+      type: item.facility_type || "",
       website: item.website || "",
       rating: item.rating || 0,
       latitude: item.latitude || null,
@@ -59,15 +60,15 @@ export async function getFacilities(): Promise<Facility[]> {
       price_max: null,
       description: item.description || "",
       created_at: item.created_at,
-      contact_email: item.contact_email,
-      phone_number: item.phone_number,
-      amenities: item.amenities,
-      care_types: item.care_types,
-      image_urls: item.image_urls,
-      is_featured: item.is_featured,
-      created_by: item.created_by,
+      contact_email: null, // Not in database schema
+      phone_number: item.phone || "",
+      amenities: [], // Not in database schema
+      care_types: item.facility_type ? [item.facility_type] : [],
+      image_urls: [], // Not in database schema
+      is_featured: item.is_promoted || false,
+      created_by: null, // Not in database schema
       updated_at: item.updated_at,
-      url: item.url,
+      url: item.website || "",
     }));
 
     return facilities;
@@ -94,12 +95,12 @@ export async function getFacilityById(id: string): Promise<Facility | null> {
     const facility: Facility = {
       id: data.id,
       name: data.name,
-      address: data.address,
+      address: data.address || "",
       city: data.city || "",
       state: data.state || "",
-      zip_code: data.zip_code || "",
-      phone: data.phone_number || "",
-      type: Array.isArray(data.care_types) && data.care_types.length > 0 ? data.care_types[0] : "",
+      zip_code: data.zip || "",
+      phone: data.phone || "",
+      type: data.facility_type || "",
       website: data.website || "",
       rating: data.rating || 0,
       latitude: data.latitude || null,
@@ -108,15 +109,15 @@ export async function getFacilityById(id: string): Promise<Facility | null> {
       price_min: null,
       price_max: null,
       description: data.description || "",
-      contact_email: data.contact_email,
-      phone_number: data.phone_number,
-      amenities: data.amenities,
-      care_types: data.care_types,
-      image_urls: data.image_urls,
-      is_featured: data.is_featured,
-      created_by: data.created_by,
+      contact_email: null, // Not in database schema
+      phone_number: data.phone || "",
+      amenities: [], // Not in database schema
+      care_types: data.facility_type ? [data.facility_type] : [],
+      image_urls: [], // Not in database schema
+      is_featured: data.is_promoted || false,
+      created_by: null, // Not in database schema
       updated_at: data.updated_at,
-      url: data.url,
+      url: data.website || "",
     };
 
     return facility;
@@ -135,21 +136,16 @@ export async function createFacility(facility: Omit<Facility, 'id' | 'created_at
       address: facility.address,
       city: facility.city,
       state: facility.state,
-      zip_code: facility.zip_code,
-      phone_number: facility.phone || facility.phone_number || "",
+      zip: facility.zip_code,
+      phone: facility.phone || facility.phone_number || "",
       website: facility.website || null,
       rating: facility.rating || 0,
       latitude: facility.latitude || null,
       longitude: facility.longitude || null,
-      price_min: facility.price_min || null,
-      price_max: facility.price_max || null,
       description: facility.description || "",
-      care_types: facility.care_types || [facility.type], 
-      contact_email: facility.contact_email || null,
-      amenities: facility.amenities || [],
-      image_urls: facility.image_urls || [],
-      is_featured: facility.is_featured || false,
-      created_by: facility.created_by || null,
+      facility_type: facility.type || (facility.care_types && facility.care_types[0]) || null,
+      is_promoted: facility.is_featured || false,
+      data_source: 'manual'
     };
 
     const { data, error } = await supabase
@@ -163,9 +159,30 @@ export async function createFacility(facility: Omit<Facility, 'id' | 'created_at
 
     toast.success('Facility created successfully');
     return data[0] ? {
-      ...data[0],
-      phone: data[0].phone_number || "",
-      type: Array.isArray(data[0].care_types) && data[0].care_types.length > 0 ? data[0].care_types[0] : "",
+      id: data[0].id,
+      name: data[0].name,
+      address: data[0].address || "",
+      city: data[0].city || "",
+      state: data[0].state || "",
+      zip_code: data[0].zip || "",
+      phone: data[0].phone || "",
+      type: data[0].facility_type || "",
+      website: data[0].website || "",
+      rating: data[0].rating || 0,
+      latitude: data[0].latitude || null,
+      longitude: data[0].longitude || null,
+      price_min: null,
+      price_max: null,
+      description: data[0].description || "",
+      contact_email: null,
+      phone_number: data[0].phone || "",
+      amenities: [],
+      care_types: data[0].facility_type ? [data[0].facility_type] : [],
+      image_urls: [],
+      is_featured: data[0].is_promoted || false,
+      created_by: null,
+      updated_at: data[0].updated_at,
+      url: data[0].website || "",
     } : null;
   } catch (error) {
     console.error('Error creating facility:', error);
@@ -177,19 +194,25 @@ export async function createFacility(facility: Omit<Facility, 'id' | 'created_at
 export async function updateFacility(id: string, facility: Partial<Facility>): Promise<Facility | null> {
   try {
     // Prepare data for update
-    const updateData: any = { ...facility };
+    const updateData: any = {};
     
-    // Handle the potential remapping of 'phone' to 'phone_number'
-    if (facility.phone && !facility.phone_number) {
-      updateData.phone_number = facility.phone;
-      delete updateData.phone;
+    if (facility.name !== undefined) updateData.name = facility.name;
+    if (facility.address !== undefined) updateData.address = facility.address;
+    if (facility.city !== undefined) updateData.city = facility.city;
+    if (facility.state !== undefined) updateData.state = facility.state;
+    if (facility.zip_code !== undefined) updateData.zip = facility.zip_code;
+    if (facility.phone !== undefined) updateData.phone = facility.phone;
+    if (facility.phone_number !== undefined) updateData.phone = facility.phone_number;
+    if (facility.website !== undefined) updateData.website = facility.website;
+    if (facility.rating !== undefined) updateData.rating = facility.rating;
+    if (facility.latitude !== undefined) updateData.latitude = facility.latitude;
+    if (facility.longitude !== undefined) updateData.longitude = facility.longitude;
+    if (facility.description !== undefined) updateData.description = facility.description;
+    if (facility.type !== undefined) updateData.facility_type = facility.type;
+    if (facility.care_types !== undefined && facility.care_types.length > 0) {
+      updateData.facility_type = facility.care_types[0];
     }
-
-    // Handle type conversion to care_types array if needed
-    if (facility.type && !facility.care_types) {
-      updateData.care_types = [facility.type];
-      delete updateData.type;
-    }
+    if (facility.is_featured !== undefined) updateData.is_promoted = facility.is_featured;
 
     const { data, error } = await supabase
       .from('facilities')
@@ -203,9 +226,30 @@ export async function updateFacility(id: string, facility: Partial<Facility>): P
 
     toast.success('Facility updated successfully');
     return data[0] ? {
-      ...data[0],
-      phone: data[0].phone_number || "",
-      type: Array.isArray(data[0].care_types) && data[0].care_types.length > 0 ? data[0].care_types[0] : "",
+      id: data[0].id,
+      name: data[0].name,
+      address: data[0].address || "",
+      city: data[0].city || "",
+      state: data[0].state || "",
+      zip_code: data[0].zip || "",
+      phone: data[0].phone || "",
+      type: data[0].facility_type || "",
+      website: data[0].website || "",
+      rating: data[0].rating || 0,
+      latitude: data[0].latitude || null,
+      longitude: data[0].longitude || null,
+      price_min: null,
+      price_max: null,
+      description: data[0].description || "",
+      contact_email: null,
+      phone_number: data[0].phone || "",
+      amenities: [],
+      care_types: data[0].facility_type ? [data[0].facility_type] : [],
+      image_urls: [],
+      is_featured: data[0].is_promoted || false,
+      created_by: null,
+      updated_at: data[0].updated_at,
+      url: data[0].website || "",
     } : null;
   } catch (error) {
     console.error(`Error updating facility with ID ${id}:`, error);
