@@ -1,12 +1,12 @@
+
 import React from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 
 const CallToAction = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const handleDemoRequest = () => {
     // Show confirmation toast
@@ -15,8 +15,11 @@ const CallToAction = () => {
       description: "Our team will contact you shortly to schedule a demo.",
     });
     
-    // Navigate to contact form
-    navigate('/#contact');
+    // Scroll to contact section
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (

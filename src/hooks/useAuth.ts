@@ -1,165 +1,88 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 
-export interface UserProfile {
-  id: string;
-  email: string;
-  avatar_url?: string;
-  full_name?: string;
-}
-
 export function useAuth() {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up listener for auth changes
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (session?.user) {
-          setUser({
-            id: session.user.id,
-            email: session.user.email || '',
-            avatar_url: session.user.user_metadata?.avatar_url,
-            full_name: session.user.user_metadata?.full_name,
-          });
-        } else {
-          setUser(null);
-        }
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
         setLoading(false);
       }
     );
 
-    // Check for current session
-    const fetchUser = async () => {
-      setLoading(true);
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          setUser({
-            id: session.user.id,
-            email: session.user.email || '',
-            avatar_url: session.user.user_metadata?.avatar_url,
-            full_name: session.user.user_metadata?.full_name,
-          });
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error('Error fetching user:', error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-    fetchUser();
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        toast.error(error.message);
-        return false;
+  const signUp = async (email: string, password: string) => {
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl
       }
+    });
 
-      if (data.user) {
-        toast.success('Signed in successfully');
-        return true;
-      }
-      
-      return false;
-    } catch (error) {
-      console.error('Error signing in:', error);
-      toast.error('An error occurred during sign in');
-      return false;
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('Check your email for the confirmation link');
     }
+
+    return { error };
   };
 
-  const signUp = async (email: string, password: string, metadata?: { full_name?: string }) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: metadata,
-        },
-      });
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-      if (error) {
-        toast.error(error.message);
-        return false;
-      }
-
-      if (data.user) {
-        toast.success('Account created successfully! Please check your email for verification.');
-        return true;
-      }
-      
-      return false;
-    } catch (error) {
-      console.error('Error signing up:', error);
-      toast.error('An error occurred during sign up');
-      return false;
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('Welcome back!');
     }
+
+    return { error };
   };
 
   const signOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        toast.error(error.message);
-        return false;
-      }
-      
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      toast.error(error.message);
+    } else {
       toast.success('Signed out successfully');
-      return true;
-    } catch (error) {
-      console.error('Error signing out:', error);
-      toast.error('An error occurred during sign out');
-      return false;
     }
-  };
-
-  const resetPassword = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      
-      if (error) {
-        toast.error(error.message);
-        return false;
-      }
-      
-      toast.success('Password reset email sent');
-      return true;
-    } catch (error) {
-      console.error('Error resetting password:', error);
-      toast.error('An error occurred during password reset');
-      return false;
-    }
+    
+    return { error };
   };
 
   return {
     user,
+    session,
     loading,
-    signIn,
-    signUp,
-    signOut,
-    resetPassword,
     isAuthenticated: !!user,
+    signUp,
+    signIn,
+    signOut,
   };
 }

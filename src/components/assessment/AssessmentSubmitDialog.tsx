@@ -23,35 +23,38 @@ const AssessmentSubmitDialog: React.FC<AssessmentSubmitDialogProps> = ({
       // Call the original onSubmit handler
       onSubmit();
       
-      // Only proceed if we have a user ID
+      // Only proceed with API call if we have a user ID
       if (user?.id) {
-        // Call the Supabase edge function to save the assessment
-        const response = await fetch("https://fktcmikrsgutyicluegr.supabase.co/functions/v1/supabase-save-assessment-fn-v1", {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ 
-            formData,
-            userId: user.id
-          }),
-        });
+        try {
+          const response = await fetch("https://zpfaojrmcozacnsnwmra.supabase.co/functions/v1/supabase-save-assessment-fn-v1", {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ 
+              formData,
+              userId: user.id
+            }),
+          });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Failed to save assessment:", errorData);
-          // Don't throw an error here since the UI flow already proceeded
-          toast.error("Your assessment was submitted but there was an issue saving your data.");
-        } else {
-          toast.success("Assessment saved successfully!");
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Failed to save assessment:", errorData);
+            toast.error("Your assessment was submitted but there was an issue saving your data.");
+          } else {
+            toast.success("Assessment saved successfully!");
+          }
+        } catch (error) {
+          console.error("Error calling save assessment function:", error);
+          toast.error("Assessment submitted successfully, but couldn't save to your profile.");
         }
       } else {
         console.warn("No user ID available, assessment not saved to database");
         toast.info("Assessment submitted. Create an account to save your assessments.");
       }
     } catch (error) {
-      console.error("Error saving assessment:", error);
-      toast.error("There was a problem saving your assessment data.");
+      console.error("Error in assessment submission:", error);
+      toast.error("There was a problem submitting your assessment.");
     }
   };
 

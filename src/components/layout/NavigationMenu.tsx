@@ -13,6 +13,13 @@ import {
 } from "@/components/ui/navigation-menu"
 
 export function NavigationMenuDemo() {
+  const scrollToContact = () => {
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <NavigationMenu>
       <NavigationMenuList>
@@ -53,11 +60,11 @@ export function NavigationMenuDemo() {
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <Link to="#contact">
+          <button onClick={scrollToContact}>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Contact
             </NavigationMenuLink>
-          </Link>
+          </button>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,187 +9,130 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Loader2, User } from 'lucide-react';
 
-interface AuthDialogProps {
-  trigger?: React.ReactNode;
-  defaultTab?: 'sign-in' | 'sign-up';
-  onSuccess?: () => void;
-}
-
-export function AuthDialog({ trigger, defaultTab = 'sign-in', onSuccess }: AuthDialogProps) {
+export function AuthDialog() {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'sign-in' | 'sign-up'>(defaultTab);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [loading, setLoading] = useState(false);
-  
-  const { signIn, signUp, resetPassword } = useAuth();
-  
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn, signUp } = useAuth();
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     
-    try {
-      const success = await signIn(email, password);
-      if (success) {
-        setOpen(false);
-        if (onSuccess) onSuccess();
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+    const { error } = await signIn(email, password);
     
-    try {
-      const success = await signUp(email, password, { full_name: fullName });
-      if (success) {
-        setOpen(false);
-        if (onSuccess) onSuccess();
-      }
-    } finally {
-      setLoading(false);
+    if (!error) {
+      setOpen(false);
+      setEmail('');
+      setPassword('');
     }
+    
+    setIsLoading(false);
   };
 
-  const handleForgotPassword = async () => {
-    if (!email) {
-      alert("Please enter your email address first");
-      return;
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    const { error } = await signUp(email, password);
+    
+    if (!error) {
+      setOpen(false);
+      setEmail('');
+      setPassword('');
     }
     
-    setLoading(true);
-    try {
-      await resetPassword(email);
-    } finally {
-      setLoading(false);
-    }
+    setIsLoading(false);
   };
-  
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger || <Button>Sign In</Button>}
+        <Button variant="outline" size="sm">
+          <User className="h-4 w-4 mr-2" />
+          Sign In
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle>Authentication</DialogTitle>
+          <DialogTitle>Welcome to HealthProAssist</DialogTitle>
           <DialogDescription>
-            Sign in to your account or create a new one
+            Sign in to your account or create a new one to get started.
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue={activeTab} onValueChange={(v) => setActiveTab(v as 'sign-in' | 'sign-up')}>
+        <Tabs defaultValue="signin" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sign-in">Sign In</TabsTrigger>
-            <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
+            <TabsTrigger value="signin">Sign In</TabsTrigger>
+            <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="sign-in">
-            <form onSubmit={handleSignIn} className="space-y-4 pt-4">
+          <TabsContent value="signin">
+            <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="signin-email">Email</Label>
-                <Input 
-                  id="signin-email" 
-                  type="email" 
-                  placeholder="your.email@example.com"
+                <Input
+                  id="signin-email"
+                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
                   required
                 />
               </div>
-              
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="signin-password">Password</Label>
-                  <Button 
-                    variant="link" 
-                    size="sm" 
-                    className="p-0 h-auto text-xs"
-                    type="button"
-                    onClick={handleForgotPassword}
-                  >
-                    Forgot password?
-                  </Button>
-                </div>
-                <Input 
-                  id="signin-password" 
+                <Label htmlFor="signin-password">Password</Label>
+                <Input
+                  id="signin-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
                   required
                 />
               </div>
-              
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing In...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Sign In
               </Button>
             </form>
           </TabsContent>
           
-          <TabsContent value="sign-up">
-            <form onSubmit={handleSignUp} className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="signup-name">Full Name</Label>
-                <Input 
-                  id="signup-name" 
-                  placeholder="John Doe"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                />
-              </div>
-              
+          <TabsContent value="signup">
+            <form onSubmit={handleSignUp} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="signup-email">Email</Label>
-                <Input 
-                  id="signup-email" 
-                  type="email" 
-                  placeholder="your.email@example.com"
+                <Input
+                  id="signup-email"
+                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
                   required
                 />
               </div>
-              
               <div className="space-y-2">
                 <Label htmlFor="signup-password">Password</Label>
-                <Input 
-                  id="signup-password" 
+                <Input
+                  id="signup-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Create a password"
                   required
+                  minLength={6}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Password must be at least 6 characters
-                </p>
               </div>
-              
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating Account...
-                  </>
-                ) : (
-                  "Create Account"
-                )}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Create Account
               </Button>
             </form>
           </TabsContent>

@@ -14,15 +14,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, LogOut, User, Settings, Heart } from 'lucide-react';
 import { AuthDialog } from './AuthDialog';
 import { Link } from 'react-router-dom';
+import { useToast } from "@/hooks/use-toast";
 
 export function UserProfileMenu() {
   const { user, loading, signOut, isAuthenticated } = useAuth();
+  const { toast } = useToast();
   
   const getInitials = () => {
-    if (user?.full_name) {
-      return user.full_name
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name
         .split(' ')
-        .map(name => name[0])
+        .map((name: string) => name[0])
         .join('')
         .toUpperCase();
     }
@@ -32,6 +34,27 @@ export function UserProfileMenu() {
     }
     
     return 'U';
+  };
+
+  const handleProfileClick = () => {
+    toast({
+      title: "Coming Soon",
+      description: "Profile management is under development.",
+    });
+  };
+
+  const handleFavoritesClick = () => {
+    toast({
+      title: "Coming Soon", 
+      description: "Saved facilities feature is under development.",
+    });
+  };
+
+  const handleSettingsClick = () => {
+    toast({
+      title: "Coming Soon",
+      description: "Settings page is under development.",
+    });
   };
   
   if (loading) {
@@ -51,7 +74,7 @@ export function UserProfileMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar>
-            <AvatarImage src={user?.avatar_url} />
+            <AvatarImage src={user?.user_metadata?.avatar_url} />
             <AvatarFallback>{getInitials()}</AvatarFallback>
           </Avatar>
         </Button>
@@ -60,31 +83,25 @@ export function UserProfileMenu() {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">{user?.full_name || 'User'}</p>
+            <p className="text-sm font-medium">{user?.user_metadata?.full_name || 'User'}</p>
             <p className="text-xs text-muted-foreground truncate max-w-[200px]">{user?.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem asChild>
-          <Link to="/profile" className="cursor-pointer flex w-full">
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
-          </Link>
+        <DropdownMenuItem onClick={handleProfileClick}>
+          <User className="mr-2 h-4 w-4" />
+          <span>Profile</span>
         </DropdownMenuItem>
         
-        <DropdownMenuItem asChild>
-          <Link to="/favorites" className="cursor-pointer flex w-full">
-            <Heart className="mr-2 h-4 w-4" />
-            <span>Saved Facilities</span>
-          </Link>
+        <DropdownMenuItem onClick={handleFavoritesClick}>
+          <Heart className="mr-2 h-4 w-4" />
+          <span>Saved Facilities</span>
         </DropdownMenuItem>
         
-        <DropdownMenuItem asChild>
-          <Link to="/settings" className="cursor-pointer flex w-full">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </Link>
+        <DropdownMenuItem onClick={handleSettingsClick}>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Settings</span>
         </DropdownMenuItem>
         
         <DropdownMenuSeparator />

@@ -1,8 +1,8 @@
+
 import React, { useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from "@/hooks/use-toast";
-import { Link } from 'react-router-dom';
 
 const ContactSection = () => {
   const { toast } = useToast();
@@ -46,6 +46,20 @@ const ContactSection = () => {
       email: '',
       subject: '',
       message: ''
+    });
+  };
+
+  const handleDemoRequest = () => {
+    toast({
+      title: "Demo Request Sent",
+      description: "We'll contact you soon to schedule your personalized demo.",
+    });
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
     });
   };
 
@@ -143,39 +157,52 @@ const ContactSection = () => {
               <p className="text-gray-600 mb-6">
                 See Ava in action with a personalized demo tailored to your specific needs and workflows.
               </p>
-              <Link to="/#contact">
-                <Button className="bg-hpa-blue hover:bg-blue-600 text-white px-6 py-2 w-full">
-                  Book a Demo
-                </Button>
-              </Link>
+              <Button 
+                className="bg-hpa-blue hover:bg-blue-600 text-white px-6 py-2 w-full"
+                onClick={handleDemoRequest}
+              >
+                Book a Demo
+              </Button>
             </div>
             
             <div className="glass-card p-8 rounded-xl shadow-elevation">
               <h3 className="text-2xl font-semibold mb-6 text-hpa-dark">Support Resources</h3>
               <ul className="space-y-4 text-gray-600">
                 <li>
-                  <a href="#" className="hover:text-hpa-blue transition flex items-center">
+                  <button 
+                    onClick={scrollToTop}
+                    className="hover:text-hpa-blue transition flex items-center"
+                  >
                     <ArrowUp className="h-4 w-4 rotate-45 mr-2" />
                     <span>Knowledge Base</span>
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-hpa-blue transition flex items-center">
+                  <button 
+                    onClick={scrollToTop}
+                    className="hover:text-hpa-blue transition flex items-center"
+                  >
                     <ArrowUp className="h-4 w-4 rotate-45 mr-2" />
                     <span>Video Tutorials</span>
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-hpa-blue transition flex items-center">
+                  <button 
+                    onClick={scrollToTop}
+                    className="hover:text-hpa-blue transition flex items-center"
+                  >
                     <ArrowUp className="h-4 w-4 rotate-45 mr-2" />
                     <span>FAQ</span>
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-hpa-blue transition flex items-center">
+                  <button 
+                    onClick={scrollToTop}
+                    className="hover:text-hpa-blue transition flex items-center"
+                  >
                     <ArrowUp className="h-4 w-4 rotate-45 mr-2" />
                     <span>User Guides</span>
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>

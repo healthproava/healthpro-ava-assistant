@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
 
 // Define the form schema
 const formSchema = z.object({
@@ -43,6 +44,8 @@ interface AvaQuestionnaireProps {
 }
 
 const AvaQuestionnaire = ({ open, onComplete }: AvaQuestionnaireProps) => {
+  const { toast } = useToast();
+  
   const form = useForm<QuestionnaireData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,6 +56,10 @@ const AvaQuestionnaire = ({ open, onComplete }: AvaQuestionnaireProps) => {
   });
 
   function onSubmit(data: QuestionnaireData) {
+    toast({
+      title: "Preferences Saved",
+      description: "Ava is now highlighting facilities that match your criteria.",
+    });
     onComplete(data);
   }
 

@@ -25,85 +25,26 @@ export type Database = {
           id?: string
           vector?: number[] | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "ai_embeddings_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      facilities: {
+      conversation_history: {
         Row: {
-          address: string | null
-          city: string | null
+          conversation: string | null
           created_at: string | null
-          data_source: string | null
-          description: string | null
-          facility_type: string | null
-          geo: Json | null
-          id: string
-          is_promoted: boolean | null
-          latitude: number | null
-          longitude: number | null
-          name: string
-          phone: string | null
-          place_id: string | null
-          rating: number | null
-          reviews_count: number | null
-          state: string | null
-          tags: string[] | null
-          updated_at: string | null
-          website: string | null
-          zip: string | null
+          id: number
+          user_id: string | null
         }
         Insert: {
-          address?: string | null
-          city?: string | null
+          conversation?: string | null
           created_at?: string | null
-          data_source?: string | null
-          description?: string | null
-          facility_type?: string | null
-          geo?: Json | null
-          id?: string
-          is_promoted?: boolean | null
-          latitude?: number | null
-          longitude?: number | null
-          name: string
-          phone?: string | null
-          place_id?: string | null
-          rating?: number | null
-          reviews_count?: number | null
-          state?: string | null
-          tags?: string[] | null
-          updated_at?: string | null
-          website?: string | null
-          zip?: string | null
+          id?: never
+          user_id?: string | null
         }
         Update: {
-          address?: string | null
-          city?: string | null
+          conversation?: string | null
           created_at?: string | null
-          data_source?: string | null
-          description?: string | null
-          facility_type?: string | null
-          geo?: Json | null
-          id?: string
-          is_promoted?: boolean | null
-          latitude?: number | null
-          longitude?: number | null
-          name?: string
-          phone?: string | null
-          place_id?: string | null
-          rating?: number | null
-          reviews_count?: number | null
-          state?: string | null
-          tags?: string[] | null
-          updated_at?: string | null
-          website?: string | null
-          zip?: string | null
+          id?: never
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -126,15 +67,196 @@ export type Database = {
           id?: string
           value?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "features_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      google_places_results: {
+        Row: {
+          business_status: string | null
+          created_at: string | null
+          formatted_address: string | null
+          icon: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          opening_hours: Json | null
+          phone_number: string | null
+          photos: Json | null
+          place_id: string
+          plus_code: Json | null
+          price_level: number | null
+          rating: number | null
+          thumbnails: string[] | null
+          types: string[] | null
+          user_ratings_total: number | null
+          website: string | null
+        }
+        Insert: {
+          business_status?: string | null
+          created_at?: string | null
+          formatted_address?: string | null
+          icon?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          opening_hours?: Json | null
+          phone_number?: string | null
+          photos?: Json | null
+          place_id: string
+          plus_code?: Json | null
+          price_level?: number | null
+          rating?: number | null
+          thumbnails?: string[] | null
+          types?: string[] | null
+          user_ratings_total?: number | null
+          website?: string | null
+        }
+        Update: {
+          business_status?: string | null
+          created_at?: string | null
+          formatted_address?: string | null
+          icon?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          opening_hours?: Json | null
+          phone_number?: string | null
+          photos?: Json | null
+          place_id?: string
+          plus_code?: Json | null
+          price_level?: number | null
+          rating?: number | null
+          thumbnails?: string[] | null
+          types?: string[] | null
+          user_ratings_total?: number | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      nationwide_facilities: {
+        Row: {
+          "Abuse Icon": string | null
+          "Affiliated Entity ID": string | null
+          "Affiliated Entity Name": string | null
+          "Average Number of Residents per Day": number | null
+          "City/Town": string | null
+          "CMS Certification Number (CCN)": string | null
+          "Continuing Care Retirement Community": string | null
+          "County/Parish": string | null
+          "Date First Approved to Provide Medicare and Medicaid Services":
+            | string
+            | null
+          "Health Inspection Rating": number | null
+          Latitude: number | null
+          "Legal Business Name": string | null
+          Location: string | null
+          Longitude: number | null
+          "Number of Certified Beds": number | null
+          "Number of Citations from Infection Control Inspections":
+            | string
+            | null
+          "Number of Facility Reported Incidents": string | null
+          "Number of Fines": string | null
+          "Number of Substantiated Complaints": string | null
+          "Overall Rating": number | null
+          "Provider Address": string | null
+          "Provider Name": string | null
+          "Provider SSA County Code": number | null
+          "Provider Type": string | null
+          "QM Rating": number | null
+          "QM Rating Footnote": string | null
+          "Special Focus Status": string | null
+          "Staffing Rating": number | null
+          State: string | null
+          "Telephone Number": number | null
+          "Total Amount of Fines in Dollars": string | null
+          "Total Number of Penalties": string | null
+          UUID: string
+          "ZIP Code": number | null
+        }
+        Insert: {
+          "Abuse Icon"?: string | null
+          "Affiliated Entity ID"?: string | null
+          "Affiliated Entity Name"?: string | null
+          "Average Number of Residents per Day"?: number | null
+          "City/Town"?: string | null
+          "CMS Certification Number (CCN)"?: string | null
+          "Continuing Care Retirement Community"?: string | null
+          "County/Parish"?: string | null
+          "Date First Approved to Provide Medicare and Medicaid Services"?:
+            | string
+            | null
+          "Health Inspection Rating"?: number | null
+          Latitude?: number | null
+          "Legal Business Name"?: string | null
+          Location?: string | null
+          Longitude?: number | null
+          "Number of Certified Beds"?: number | null
+          "Number of Citations from Infection Control Inspections"?:
+            | string
+            | null
+          "Number of Facility Reported Incidents"?: string | null
+          "Number of Fines"?: string | null
+          "Number of Substantiated Complaints"?: string | null
+          "Overall Rating"?: number | null
+          "Provider Address"?: string | null
+          "Provider Name"?: string | null
+          "Provider SSA County Code"?: number | null
+          "Provider Type"?: string | null
+          "QM Rating"?: number | null
+          "QM Rating Footnote"?: string | null
+          "Special Focus Status"?: string | null
+          "Staffing Rating"?: number | null
+          State?: string | null
+          "Telephone Number"?: number | null
+          "Total Amount of Fines in Dollars"?: string | null
+          "Total Number of Penalties"?: string | null
+          UUID?: string
+          "ZIP Code"?: number | null
+        }
+        Update: {
+          "Abuse Icon"?: string | null
+          "Affiliated Entity ID"?: string | null
+          "Affiliated Entity Name"?: string | null
+          "Average Number of Residents per Day"?: number | null
+          "City/Town"?: string | null
+          "CMS Certification Number (CCN)"?: string | null
+          "Continuing Care Retirement Community"?: string | null
+          "County/Parish"?: string | null
+          "Date First Approved to Provide Medicare and Medicaid Services"?:
+            | string
+            | null
+          "Health Inspection Rating"?: number | null
+          Latitude?: number | null
+          "Legal Business Name"?: string | null
+          Location?: string | null
+          Longitude?: number | null
+          "Number of Certified Beds"?: number | null
+          "Number of Citations from Infection Control Inspections"?:
+            | string
+            | null
+          "Number of Facility Reported Incidents"?: string | null
+          "Number of Fines"?: string | null
+          "Number of Substantiated Complaints"?: string | null
+          "Overall Rating"?: number | null
+          "Provider Address"?: string | null
+          "Provider Name"?: string | null
+          "Provider SSA County Code"?: number | null
+          "Provider Type"?: string | null
+          "QM Rating"?: number | null
+          "QM Rating Footnote"?: string | null
+          "Special Focus Status"?: string | null
+          "Staffing Rating"?: number | null
+          State?: string | null
+          "Telephone Number"?: number | null
+          "Total Amount of Fines in Dollars"?: string | null
+          "Total Number of Penalties"?: string | null
+          UUID?: string
+          "ZIP Code"?: number | null
+        }
+        Relationships: []
       }
       photos: {
         Row: {
@@ -155,15 +277,7 @@ export type Database = {
           id?: string
           image_url?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "photos_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       reviews: {
         Row: {
@@ -190,15 +304,7 @@ export type Database = {
           rating?: number | null
           title?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       search_logs: {
         Row: {
@@ -224,7 +330,28 @@ export type Database = {
         }
         Relationships: []
       }
-      serpapi_raw_results: {
+      search_results: {
+        Row: {
+          created_at: string | null
+          id: string
+          results: Json | null
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          results?: Json | null
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          results?: Json | null
+          session_id?: string | null
+        }
+        Relationships: []
+      }
+      serperapi_raw_results: {
         Row: {
           created_at: string
           error_message: string | null
@@ -286,6 +413,72 @@ export type Database = {
           search_criteria?: Json
           serpapi_query_sent?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      va_form_21p_534ez: {
+        Row: {
+          address: string
+          assets: number
+          claimant_full_name: string
+          created_at: string | null
+          date_of_death: string
+          direct_deposit_account: string
+          direct_deposit_routing: string
+          email: string
+          id: string
+          income: number
+          marriage_date: string
+          number_of_children: number
+          phone: string
+          place_of_death: string
+          relationship: string
+          ssn: string
+          updated_at: string | null
+          veteran_full_name: string
+          veteran_ssn: string
+        }
+        Insert: {
+          address: string
+          assets: number
+          claimant_full_name: string
+          created_at?: string | null
+          date_of_death: string
+          direct_deposit_account: string
+          direct_deposit_routing: string
+          email: string
+          id?: string
+          income: number
+          marriage_date: string
+          number_of_children: number
+          phone: string
+          place_of_death: string
+          relationship: string
+          ssn: string
+          updated_at?: string | null
+          veteran_full_name: string
+          veteran_ssn: string
+        }
+        Update: {
+          address?: string
+          assets?: number
+          claimant_full_name?: string
+          created_at?: string | null
+          date_of_death?: string
+          direct_deposit_account?: string
+          direct_deposit_routing?: string
+          email?: string
+          id?: string
+          income?: number
+          marriage_date?: string
+          number_of_children?: number
+          phone?: string
+          place_of_death?: string
+          relationship?: string
+          ssn?: string
+          updated_at?: string | null
+          veteran_full_name?: string
+          veteran_ssn?: string
         }
         Relationships: []
       }
