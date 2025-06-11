@@ -46,7 +46,7 @@ export function useFacilitySearch(params: SearchParams, enabled = true) {
       }
       
       if (params.type && params.type !== 'all') {
-        filtered = filtered.filter(f => f.type.includes(params.type!));
+        filtered = filtered.filter(f => f.type.toLowerCase().includes(params.type!.toLowerCase()));
       }
       
       if (params.location) {
