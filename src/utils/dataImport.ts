@@ -98,12 +98,14 @@ const sampleFacilities = [
 
 /**
  * Import sample facility data to the database
+ * Note: This function is disabled as we're using the nationwide_facilities table
+ * which contains real CMS data and should not be modified.
  */
 export async function importSampleFacilities(): Promise<boolean> {
   try {
-    // First check if data already exists
+    // Check if nationwide facilities data exists
     const { count, error: countError } = await supabase
-      .from('facilities')
+      .from('nationwide_facilities')
       .select('*', { count: 'exact', head: true });
     
     if (countError) {
@@ -112,48 +114,15 @@ export async function importSampleFacilities(): Promise<boolean> {
       return false;
     }
     
-    // If there's already data, don't import
     if (count && count > 0) {
-      toast.info('Sample facility data already exists in the database');
+      toast.info(`Database already contains ${count} facilities from the nationwide CMS dataset`);
       return true;
-    }
-    
-    // Format the data to match the Supabase table structure
-    const facilitiesForImport = sampleFacilities.map(facility => ({
-      name: facility.name,
-      address: facility.address,
-      city: facility.city,
-      state: facility.state,
-      zip_code: facility.zip_code,
-      phone_number: facility.phone,
-      website: facility.website,
-      rating: facility.rating,
-      latitude: facility.latitude,
-      longitude: facility.longitude,
-      price_min: facility.price_min,
-      price_max: facility.price_max,
-      care_types: [facility.type],
-      description: `${facility.name} is a ${facility.type} facility located in ${facility.city}, ${facility.state}.`,
-      amenities: ["24/7 Staff", "Dining", "Activities"]
-    }));
-    
-    // Import sample data
-    const { data, error } = await supabase
-      .from('facilities')
-      .insert(facilitiesForImport)
-      .select();
-    
-    if (error) {
-      console.error('Error importing sample facilities:', error);
-      toast.error('Failed to import sample data');
+    } else {
+      toast.info('No facility data found. The app uses real CMS data from the nationwide_facilities table.');
       return false;
     }
-    
-    console.log('Sample facilities imported:', data?.length);
-    toast.success(`Imported ${data?.length} sample facilities`);
-    return true;
   } catch (error) {
-    console.error('Unexpected error importing facilities:', error);
+    console.error('Unexpected error checking facilities:', error);
     toast.error('An unexpected error occurred');
     return false;
   }
@@ -161,24 +130,15 @@ export async function importSampleFacilities(): Promise<boolean> {
 
 /**
  * Admin function to clear all facilities data
+ * Note: This function is disabled as the nationwide_facilities table
+ * contains official CMS data and should not be modified.
  */
 export async function clearAllFacilities() {
   try {
-    const { error } = await supabase
-      .from('facilities')
-      .delete()
-      .neq('id', 'none'); // This is a workaround to delete all rows
-    
-    if (error) {
-      console.error('Error clearing facilities:', error);
-      toast.error('Failed to clear facility data');
-      return false;
-    }
-    
-    toast.success('All facility data has been cleared');
-    return true;
+    toast.error('Cannot clear nationwide facilities data - this contains official CMS data');
+    return false;
   } catch (error) {
-    console.error('Unexpected error clearing facilities:', error);
+    console.error('Unexpected error:', error);
     toast.error('An unexpected error occurred');
     return false;
   }
@@ -191,5 +151,5 @@ declare global {
   }
 }
 
-// Can be called from the developer console to import sample data
+// Can be called from the developer console to check facility data
 window.importSampleFacilities = importSampleFacilities;
