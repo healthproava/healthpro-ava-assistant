@@ -27,6 +27,42 @@ export type Database = {
         }
         Relationships: []
       }
+      assessments: {
+        Row: {
+          budget_range: string | null
+          conversation_history: Json | null
+          created_at: string | null
+          id: string
+          other_preferences: Json | null
+          preferred_location: string | null
+          recommended_care_types: string[] | null
+          summary: string | null
+          user_id: string | null
+        }
+        Insert: {
+          budget_range?: string | null
+          conversation_history?: Json | null
+          created_at?: string | null
+          id?: string
+          other_preferences?: Json | null
+          preferred_location?: string | null
+          recommended_care_types?: string[] | null
+          summary?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          budget_range?: string | null
+          conversation_history?: Json | null
+          created_at?: string | null
+          id?: string
+          other_preferences?: Json | null
+          preferred_location?: string | null
+          recommended_care_types?: string[] | null
+          summary?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       conversation_history: {
         Row: {
           conversation: string | null

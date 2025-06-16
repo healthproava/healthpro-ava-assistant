@@ -1,1 +1,11 @@
+
 project_id = "zpfaojrmcozacnsnwmra"
+
+[functions.supabase-save-assessment-fn-v1]
+verify_jwt = false
+
+[functions.chat]
+verify_jwt = false
+
+[functions.tts]
+verify_jwt = false
