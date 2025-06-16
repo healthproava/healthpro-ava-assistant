@@ -27,7 +27,6 @@ const App = () => (
           <Route path="/assessment" element={<AssessmentPage />} />
           <Route path="/facilities-map" element={
             <RequireAuth>
-              <FacilityMapPage />
             </RequireAuth>
           } />
           <Route path="/portal/dashboard" element={<Dashboard />} />
