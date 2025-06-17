@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/assessment" element={<AssessmentPage />} />
           <Route path="/facilities-map" element={
             <RequireAuth>
+              <FacilityMapPage />
             </RequireAuth>
           } />
           <Route path="/portal/dashboard" element={<Dashboard />} />
