@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -26,48 +26,59 @@ const AssessmentPage = () => {
   // Calculate progress percentage
   const progressPercentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
   
-  // Form state - would be more comprehensive in a real app
-  const [formData, setFormData] = useState<AssessmentFormData>({
-    // Personal Information
-    firstName: "",
-    lastName: "",
-    dateOfBirth: "",
-    gender: "",
-    phone: "",
-    email: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    
-    // Medical Information
-    primaryDiagnosis: "",
-    secondaryDiagnoses: "",
-    allergies: "",
-    medications: "",
-    medicalHistory: "",
-    
-    // Functional Assessment
-    mobilityStatus: "",
-    adlAssistance: [],
-    cognitiveFunctioning: "",
-    behavioralConsiderations: "",
-    
-    // Care Preferences
-    careType: "",
-    budgetRange: "",
-    locationPreference: "",
-    amenities: [],
-    specialRequirements: "",
-    
-    // Additional Information
-    insuranceInfo: "",
-    legalDocuments: [],
-    emergencyContactName: "",
-    emergencyContactPhone: "",
-    emergencyContactRelationship: "",
-    additionalNotes: ""
+  // Form state
+  const [formData, setFormData] = useState<AssessmentFormData>(() => {
+    const savedDraft = localStorage.getItem('assessmentDraft');
+    if (savedDraft) {
+      return JSON.parse(savedDraft);
+    }
+    return {
+      // Personal Information
+      firstName: "",
+      lastName: "",
+      dateOfBirth: "",
+      gender: "",
+      phone: "",
+      email: "",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      
+      // Medical Information
+      primaryDiagnosis: "",
+      secondaryDiagnoses: "",
+      allergies: "",
+      medications: "",
+      medicalHistory: "",
+      
+      // Functional Assessment
+      mobilityStatus: "",
+      adlAssistance: [],
+      cognitiveFunctioning: "",
+      behavioralConsiderations: "",
+      
+      // Care Preferences
+      careType: "",
+      budgetRange: "",
+      locationPreference: "",
+      amenities: [],
+      specialRequirements: "",
+      
+      // Additional Information
+      insuranceInfo: "",
+      legalDocuments: [],
+      emergencyContactName: "",
+      emergencyContactPhone: "",
+      emergencyContactRelationship: "",
+      additionalNotes: ""
+    }
   });
+
+  useEffect(() => {
+    // Auto-save draft on form data change
+    localStorage.setItem('assessmentDraft', JSON.stringify(formData));
+  }, [formData]);
   
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -83,44 +94,29 @@ const AssessmentPage = () => {
   // Handle checkbox changes
   const handleCheckboxChange = (name: string, checked: boolean) => {
     if (name.startsWith('adlAssistance-')) {
-      const [prefix, value] = name.split('-');
-      setFormData(prev => {
-        const currentArray = [...prev.adlAssistance];
-        if (checked) {
-          if (!currentArray.includes(value)) {
-            return { ...prev, adlAssistance: [...currentArray, value] };
-          }
-        } else {
-          return { ...prev, adlAssistance: currentArray.filter(item => item !== value) };
-        }
-        return prev;
-      });
+      const value = name.split('-')[1];
+      setFormData(prev => ({
+        ...prev,
+        adlAssistance: checked
+          ? [...prev.adlAssistance, value]
+          : prev.adlAssistance.filter(item => item !== value),
+      }));
     } else if (name.startsWith('amenities-')) {
-      const [prefix, value] = name.split('-');
-      setFormData(prev => {
-        const currentArray = [...prev.amenities];
-        if (checked) {
-          if (!currentArray.includes(value)) {
-            return { ...prev, amenities: [...currentArray, value] };
-          }
-        } else {
-          return { ...prev, amenities: currentArray.filter(item => item !== value) };
-        }
-        return prev;
-      });
+      const value = name.split('-')[1];
+      setFormData(prev => ({
+        ...prev,
+        amenities: checked
+          ? [...prev.amenities, value]
+          : prev.amenities.filter(item => item !== value),
+      }));
     } else if (name.startsWith('legalDocuments-')) {
-      const [prefix, value] = name.split('-');
-      setFormData(prev => {
-        const currentArray = [...prev.legalDocuments];
-        if (checked) {
-          if (!currentArray.includes(value)) {
-            return { ...prev, legalDocuments: [...currentArray, value] };
-          }
-        } else {
-          return { ...prev, legalDocuments: currentArray.filter(item => item !== value) };
-        }
-        return prev;
-      });
+      const value = name.split('-')[1];
+      setFormData(prev => ({
+        ...prev,
+        legalDocuments: checked
+          ? [...prev.legalDocuments, value]
+          : prev.legalDocuments.filter(item => item !== value),
+      }));
     } else {
       setFormData(prev => ({ ...prev, [name]: checked }));
     }
@@ -142,6 +138,11 @@ const AssessmentPage = () => {
       window.scrollTo(0, 0);
     }
   };
+
+  const handleSaveDraft = () => {
+    localStorage.setItem('assessmentDraft', JSON.stringify(formData));
+    toast.success("Draft saved successfully!");
+  };
   
   // Handle final form submission
   const handleSubmit = () => {
@@ -150,13 +151,7 @@ const AssessmentPage = () => {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      // Save draft of assessment data to localStorage as backup
-      try {
-        localStorage.setItem('assessmentDraft', JSON.stringify(formData));
-      } catch (error) {
-        console.error("Error saving draft to localStorage:", error);
-      }
-      // Redirect to success page or show success message
+      localStorage.removeItem('assessmentDraft'); // Clear draft after submission
       toast.success("Assessment submitted successfully!");
       window.location.href = "/portal/dashboard";
     }, 2000);
@@ -224,7 +219,7 @@ const AssessmentPage = () => {
                     <Button variant="outline" onClick={() => setShowHelpDialog(true)}>
                       Need Help?
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={handleSaveDraft}>
                       <Save className="h-4 w-4 mr-2" />
                       Save Draft
                     </Button>
